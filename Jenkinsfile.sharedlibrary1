@@ -1,0 +1,20 @@
+@Library('mylibrary')_
+
+pipeline
+{
+    agent any
+    stages
+    {
+        stage('to run shared library code')
+        {
+            steps
+            {
+                script
+                {
+                    math.sum(10,30)
+                    math.sub(40,100)
+                }
+            }
+        }
+    }
+}
