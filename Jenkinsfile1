@@ -3,7 +3,7 @@ pipeline
     agent any
     stages
     {
-        stage('contdownload-loans')
+        stage('contdownload-master')
         {
             steps
             {
@@ -21,7 +21,7 @@ pipeline
                 }
             }
         }
-        stage('contbuild-loans')
+        stage('contbuild-master')
         {
             steps
             {
@@ -39,7 +39,7 @@ pipeline
                 }
             }
         }
-        stage('contdeploy-loans')
+        stage('contdeploy-master')
         {
             steps
             {
@@ -57,5 +57,42 @@ pipeline
                 }
             }
         }
+         stage('conttesting-master')
+        {
+            steps
+            {
+                script
+                {
+                    try
+                    {
+                       git 'https://github.com/IntelliqDevops/FunctionalTesting.git'
+                       sh 'java -jar /var/lib/jenkins/workspace/declarativepipeline/testing.jar'  
+                    }
+                    catch (Exception e4)
+                    {
+                        mail bcc: '', body: 'selenium scripts are failed', cc: '', from: '', replyTo: '', subject: 'testing failed', to: 'testing.team@gmail.com'
+                        exit(1)
+                    }
+                }            
+            }
+        }
+        stage('contdelivery-master')
+        {
+            steps
+            {
+                script
+                {
+                    try
+                    {
+                         sh ' scp /var/lib/jenkins/workspace/declarativepipeline4/webapp/target/webapp.war ubuntu@172.31.24.168:/var/lib/tomcat10/webapps/prodtest.war'
+                    }
+                    catch (Exception e5)
+                    {
+                        mail bcc: '', body: 'jenkins is unable to deploy into tomcat on prodserver', cc: '', from: '', replyTo: '', subject: 'deliveryfailed', to: 'delivery.team@gmail.com'
+                    }
+                }
+            }
+        }
     }
 }
+    
