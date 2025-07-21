@@ -1,0 +1,60 @@
+@Library('mylibrary')_
+
+pipeline
+{
+    agent any
+    stages
+    { 
+        stage('contidownload')
+        {
+            steps
+            {
+                script
+                {
+                    cicd.download("maven")
+                }
+            }
+        }
+        stage('contbuild')
+        {
+            steps
+            {
+                script
+                {
+                    cicd.build()
+                }
+            }
+        }
+        stage('contdeployment')
+        {
+            steps
+            {
+                script
+                {
+                    cicd.deployment("sharedlibrary1","172.31.18.135","navya")
+                }
+            }
+        }
+        stage('conttesting')
+        {
+            steps
+            {
+                script
+                {
+                    cicd.download("functionaltesting")
+                    cicd.testing("sharedlibrary1")
+                }
+            }
+        }
+        stage('delivery')
+        {
+            steps
+            {
+                script
+                {
+                    cicd.deployment("sharedlibrary1","172.31.24.168","jashu")
+                }
+            }
+        }
+    }
+}
