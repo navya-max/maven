@@ -1,0 +1,61 @@
+pipeline
+{
+    agent any
+    stages
+    {
+        stage('contdownload-loans')
+        {
+            steps
+            {
+                script
+                {
+                   try
+                   {
+                      git 'https://github.com/IntelliqDevops/maven.git' 
+                   }
+                   catch (Exception e1)
+                   {
+                       mail bcc: '', body: 'jenkins is unable to download code from github', cc: '', from: '', replyTo: '', subject: 'download failed', to: 'git.admin@gmail.com'
+                       exit(1)
+                   }
+                }
+            }
+        }
+        stage('contbuild-loans')
+        {
+            steps
+            {
+                script
+                {
+                    try
+                    {
+                        sh 'mvn package'
+                    }
+                    catch (Exception e2)
+                    {
+                        mail bcc: '', body: 'jenkins is unable to create an artifact', cc: '', from: '', replyTo: '', subject: 'build failed', to: 'developer.team@gmail.com'
+                        exit(1)
+                    }
+                }
+            }
+        }
+        stage('contdeploy-loans')
+        {
+            steps
+            {
+                script
+                {
+                    try
+                    {
+                         sh ' scp /var/lib/jenkins/workspace/declarativepipeline4/webapp/target/webapp.war ubuntu@172.31.18.135:/var/lib/tomcat10/webapps/qatest.war'
+                    }
+                    catch (Exception e3)
+                    {
+                        mail bcc: '', body: 'jenkins is unable to deploy into tomcat', cc: '', from: '', replyTo: '', subject: 'deployment failed', to: 'middleware.team@gmail.com'
+                        exit(1)
+                    }
+                }
+            }
+        }
+    }
+}
