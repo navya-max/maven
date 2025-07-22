@@ -1,0 +1,43 @@
+pipeline
+{
+    agent any
+    stages
+    {
+        stage('contdownload')
+        {
+            steps
+            {
+                git 'https://github.com/navya-max/maven.git'
+            }
+        }
+        stage('contbuild')
+        {
+            steps
+            {
+                sh 'mvn package'
+            }
+        }
+        stage('contdeploy')
+        {
+            steps
+            {
+                sh ' scp /var/lib/jenkins/workspace/declarativepipeline/webapp/target/webapp.war ubuntu@172.31.18.135:/var/lib/tomcat10/webapps/qatest.war'
+            }
+        }
+        stage('conttesting')
+        {
+            steps
+            {
+                git 'https://github.com/IntelliqDevops/FunctionalTesting.git'
+                sh 'java -jar /var/lib/jenkins/workspace/declarativepipeline/testing.jar'
+            }
+        }
+        stage('contdelivery')
+        {
+            steps
+            {
+             sh ' scp /var/lib/jenkins/workspace/declarativepipeline/webapp/target/webapp.war ubuntu@172.31.24.168:/var/lib/tomcat10/webapps/prodtest.war'   
+            }
+        }
+    }
+}
